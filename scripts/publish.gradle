@@ -1,0 +1,51 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+group = POM_GROUP_ID
+version = POM_VERSION
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId POM_GROUP_ID
+                artifactId POM_ARTIFACT_ID
+                version POM_VERSION
+
+                from components.release
+                pom {
+                    name = POM_ARTIFACT_ID
+                    description = 'Nabto Edge WebRTC for Android clients.'
+                    url = 'https://github.com/nabto/edge-client-android-webrtc'
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'nabto'
+                            name = 'Nabto'
+                            email = 'apps@nabto.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git@github.com:nabto/edge-client-android-webrtc.git'
+                        developerConnection = 'scm:git@github.com:nabto/edge-client-android-webrtc.git'
+                        url = 'https://github.com/nabto/edge-client-android-webrtc'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+        rootProject.ext["signingKey"],
+        rootProject.ext["signingPassword"],
+    )
+    sign publishing.publications
+}
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="deploymentTargetDropDown">
+    <value>
+      <entry key="app">
+        <State />
+      </entry>
+      <entry key="sendTurnRequestShouldSucceed()">
+        <State />
+      </entry>
+      <entry key="testIceServerExample2()">
+        <State />
+      </entry>
+      <entry key="testIceServerExample3()">
+        <State />
+      </entry>
+      <entry key="testIceServerMissingUrls()">
+        <State />
+      </entry>
+      <entry key="testOffer()">
+        <State />
+      </entry>
+      <entry key="webrtc">
+        <State />
+      </entry>
+      <entry key="webrtc-demo">
+        <State />
+      </entry>
+    </value>
+  </component>
+</project>
