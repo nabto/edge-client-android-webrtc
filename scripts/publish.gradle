@@ -42,9 +42,12 @@ afterEvaluate {
 }
 
 signing {
+    def signingKeyB64 = rootProject.ext["signingKeyBase64"]
+    def signingPassword = rootProject.ext["signingPassword"]
+    def signingKey = new String(Base64.decoder.decode(signingKeyB64))
     useInMemoryPgpKeys(
-        rootProject.ext["signingKey"],
-        rootProject.ext["signingPassword"],
+        signingKey,
+            signingPassword,
     )
     sign publishing.publications
 }

@@ -6,9 +6,23 @@ plugins {
     alias(libs.plugins.nexusPlugin)
 }
 
-val ossrhUsername by extra { System.getenv("OSSRH_USERNAME") ?: "" }
-val ossrhPassword by extra { System.getenv("OSSRH_PASSWORD") ?: "" }
-val snapshot by extra { System.getenv("SNAPSHOT")?.toBoolean() ?: false }
+apply(from = "$rootDir/scripts/versioning.gradle.kts")
+
+tasks.register("showVersion") {
+    doLast {
+        println(rootProject.extra["buildVersionName"])
+    }
+}
+
+rootProject.extra.apply {
+    set("ossrhUsername",    System.getenv("OSSRH_USERNAME")     ?: "")
+    set("ossrhPassword",    System.getenv("OSSRH_PASSWORD")     ?: "")
+    set("signingKeyBase64", System.getenv("SIGNING_KEY_BASE64") ?: "")
+    set("signingPassword",  System.getenv("SIGNING_PASSWORD")   ?: "")
+}
+
+val ossrhUsername: String by extra
+val ossrhPassword: String by extra
 
 nexusPublishing {
     repositories {

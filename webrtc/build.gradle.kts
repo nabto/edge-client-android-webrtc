@@ -3,6 +3,14 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
+rootProject.extra.apply {
+    set("POM_GROUP_ID", "com.nabto.edge.client.webrtc")
+    set("POM_ARTIFACT_ID", "webrtc")
+    set("POM_VERSION", rootProject.extra["buildVersionName"])
+}
+
+apply(from ="$rootDir/scripts/publish.gradle")
+
 android {
     namespace = "com.nabto.edge.client.webrtc"
     compileSdk = 34
