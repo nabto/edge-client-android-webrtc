@@ -24,6 +24,10 @@ rootProject.extra.apply {
 val ossrhUsername: String by extra
 val ossrhPassword: String by extra
 
+if (ossrhUsername.isEmpty() || ossrhPassword.isEmpty()) {
+    throw GradleException("Credentials were not found.")
+}
+
 nexusPublishing {
     repositories {
         sonatype {
