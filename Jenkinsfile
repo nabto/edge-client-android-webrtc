@@ -16,6 +16,9 @@ pipeline {
         }
 
         stage('Deploy') {
+            agent {
+                label "linux"
+            }
             steps {
                  withCredentials([string(credentialsId: "android_signing_key", variable: "SIGNING_KEY_BASE64"),
                                   string(credentialsId: "android_signing_key_password", variable: "SIGNING_PASSWORD"),
