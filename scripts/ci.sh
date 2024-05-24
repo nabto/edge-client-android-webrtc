@@ -20,6 +20,10 @@ publish() {
     docker run --rm \
     --volume=".:/sandbox" \
     --workdir="/sandbox" \
+    -e SIGNING_KEY_BASE64=$SIGNING_KEY_BASE64 \
+    -e SIGNING_PASSWORD=$SIGNING_PASSWORD \
+    -e OSSRH_USERNAME=$OSSRH_USERNAME \
+    -e OSSRH_PASSWORD=$OSSRH_PASSWORD \
     $IMAGE_NAME "scripts/publish.sh"
 }
 
