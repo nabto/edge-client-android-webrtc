@@ -11,6 +11,7 @@ import com.nabto.edge.client.Stream
 import com.nabto.edge.client.ktx.awaitExecute
 import com.nabto.edge.client.ktx.awaitOpen
 import com.nabto.edge.client.ktx.awaitStreamClose
+import com.nabto.edge.client.webrtc.EdgeDataChannel
 import com.nabto.edge.client.webrtc.EdgeSignaling
 import com.nabto.edge.client.webrtc.EdgeWebrtcError
 import com.nabto.edge.client.webrtc.EdgeWebrtcConnection
@@ -441,5 +442,11 @@ internal class EdgeWebrtcConnectionImpl(
                 onTrackCallback?.let { cb -> cb(EdgeAudioTrackImpl(audioTrack), metadata?.trackId) }
             }
         }
+    }
+
+    override fun createDataChannel(label: String): EdgeDataChannel {
+        val init = DataChannel.Init()
+        val dc = peerConnection.createDataChannel(label, init)
+        return EdgeDataChannelImpl(dc)
     }
 }

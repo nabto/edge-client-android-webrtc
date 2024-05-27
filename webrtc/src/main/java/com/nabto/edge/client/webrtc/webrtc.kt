@@ -86,6 +86,36 @@ sealed class EdgeWebrtcError : Error() {
 }
 
 /**
+ * Callback invoked when the object has been closed
+ */
+typealias OnClosedCallback = () -> Unit
+
+/**
+ * Callback invoked when the object (e.g. a data channel) has opened.
+ */
+typealias OnOpenedCallback = () -> Unit
+
+/**
+ * Callback invoked when the remote peer has added a Track to the WebRTC connection
+ *
+ * @param track [in] The newly added track.
+ * @param trackId [in] The track ID reported by the device for this track.
+ */
+typealias OnTrackCallback = (track: EdgeMediaTrack, trackId: String?) -> Unit
+
+/**
+ * Callback invoked when an error occurs in the WebRTC connection
+ *
+ * @param error [in] The Error that occurred
+ */
+typealias OnErrorCallback = (error: EdgeWebrtcError) -> Unit
+
+/**
+ * Callback invoked when a data channel has received a message.
+ */
+typealias OnMessageCallback = (bytes: ByteArray) -> Unit
+
+/**
  * Video Track representing a Media Track of type Video
  */
 interface EdgeVideoTrack : EdgeMediaTrack {
@@ -131,25 +161,42 @@ interface EdgeAudioTrack : EdgeMediaTrack {
 }
 
 /**
- * Callback invoked when a WebRTC connection has been closed
+ * Data channel for sending and receiving bytes on a webrtc connection
  */
-typealias OnClosedCallback = () -> Unit
+interface EdgeDataChannel {
+    /**
+     * Set callback to be invoked when the data channel receives a message.
+     *
+     * @param cb The callback to set
+     */
+    fun onMessage(cb: OnMessageCallback)
 
-/**
- * Callback invoked when the remote peer has added a Track to the WebRTC connection
- *
- * @param track [in] The newly added track.
- * @param trackId [in] The track ID reported by the device for this track.
- */
-typealias OnTrackCallback = (track: EdgeMediaTrack, trackId: String?) -> Unit
+    /**
+     * Set callback to be invoked when the data channel is open and ready to send/receive messages.
+     *
+     * @param cb The callback to set
+     */
+    fun onOpen(cb: OnOpenedCallback)
 
-/**
- * Callback invoked when an error occurs in the WebRTC connection
- *
- * @param error [in] The Error that occurred
- */
-typealias OnErrorCallback = (error: EdgeWebrtcError) -> Unit
+    /**
+     * Set callback to be invoked when the data channel is closed.
+     *
+     * @param cb The callback to set
+     */
+    fun onClose(cb: OnClosedCallback)
 
+    /**
+     * Send a byte array over the data channel.
+     *
+     * @param data The binary data to be sent.
+     */
+    fun send(data: ByteArray)
+
+    /**
+     * Closes the data channel.
+     */
+    fun dataChannelClose()
+}
 
 /**
  * Main Connection interface used to connect to a device and interact with it.
@@ -185,6 +232,14 @@ interface EdgeWebrtcConnection {
      * @throws EdgeWebrtcError.SignalingFailedSend if the signaling stream failed to send messages necessary to setting up the connection.
      */
     suspend fun connect()
+
+    /**
+     * Create a new data channel
+     * WARNING: Experimental
+     *
+     * @param label A string that describes the data channel.
+     */
+    fun createDataChannel(label: String): EdgeDataChannel
 
     /**
      * Close a connected WebRTC connection.
