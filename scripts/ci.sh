@@ -13,6 +13,7 @@ build() {
     docker run --rm \
         --volume=".:/sandbox" \
         --workdir="/sandbox" \
+        --user $(id -u):$(id -g) \
         $IMAGE_NAME scripts/build.sh
 }
 
@@ -20,6 +21,7 @@ publish() {
     docker run --rm \
     --volume=".:/sandbox" \
     --workdir="/sandbox" \
+    --user $(id -u):$(id -g) \
     -e SIGNING_KEY_BASE64 \
     -e SIGNING_PASSWORD \
     -e OSSRH_USERNAME \
