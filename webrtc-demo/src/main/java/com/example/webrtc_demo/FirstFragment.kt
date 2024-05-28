@@ -11,6 +11,7 @@ import com.example.webrtc_demo.databinding.FragmentFirstBinding
 import com.nabto.edge.client.Connection
 import com.nabto.edge.client.ConnectionEventsCallback
 import com.nabto.edge.client.NabtoClient
+import com.nabto.edge.client.NabtoNoChannelsException
 import com.nabto.edge.client.webrtc.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -57,7 +58,11 @@ class FirstFragment : Fragment() {
         }
 
         pc.connect()
-        val coap = conn.createCoap("GET", "/webrtc/get")
+        val trackInfo = """
+            {"tracks": ["frontdoor-video", "frontdoor-audio"]}
+        """.trimIndent()
+        val coap = conn.createCoap("POST", "/webrtc/tracks")
+        coap.setRequestPayload(50, trackInfo.toByteArray())
         coap.execute()
         Log.i("TestApp", "Coap response: ${coap.responseStatusCode}")
         if (coap.responseStatusCode != 201) {
@@ -73,15 +78,16 @@ class FirstFragment : Fragment() {
         conn = client.createConnection()
 
         val opts = JSONObject()
-        opts.put("ProductId", "pr-4fiowoh4")
-        opts.put("DeviceId", "de-bgdqxtqs")
+        opts.put("ProductId", "pr-t3vyxzj3")
+        opts.put("DeviceId", "de-evhnqyix")
         opts.put("PrivateKey", client.createPrivateKey())
-        opts.put("ServerConnectToken", "demosct")
+        opts.put("ServerConnectToken", "ivt9EQMffMQl")
 
         conn.updateOptions(opts.toString())
         conn.addConnectionEventsListener(object : ConnectionEventsCallback() {
             override fun onEvent(event: Int) {
                 if (event == CONNECTED) {
+                    conn.passwordAuthenticate("admin", "FEVNHyYvxgWF")
                     lifecycleScope.launch {
                         onConnected()
                     }
@@ -89,7 +95,13 @@ class FirstFragment : Fragment() {
             }
 
         })
-        conn.connect()
+
+        try {
+            conn.connect()
+        } catch (e: NabtoNoChannelsException) {
+            Log.e("WebRTCDemo", "${e.localChannelErrorCode.name} :: ${e.remoteChannelErrorCode.name}")
+            throw e
+        }
     }
 
     override fun onDestroyView() {

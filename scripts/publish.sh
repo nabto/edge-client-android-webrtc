@@ -8,5 +8,6 @@ then
     ./gradlew publishReleasePublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository
 else
    echo "Publishing to sonatype staging repository without releasing..."
-   ./gradlew publishReleasePublicationToSonatypeRepository closeSonatypeStagingRepository
+   #./gradlew publishReleasePublicationToSonatypeRepository closeSonatypeStagingRepository
+   ./gradlew :webrtc:build
 fi
