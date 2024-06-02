@@ -18,6 +18,8 @@ val gitBranch = GitCommand("rev-parse", "--abbrev-ref", "HEAD")
 
 val isReleaseVersion = gitTag.isNotEmpty() && gitStatus.isEmpty()
 
+rootProject.extra["isReleaseVersion"] = isReleaseVersion
+
 rootProject.extra["buildVersionName"] = run {
     if (isReleaseVersion) {
         gitTag.substring(1)

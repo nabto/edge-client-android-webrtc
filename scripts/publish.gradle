@@ -1,8 +1,13 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-group = POM_GROUP_ID
-version = POM_VERSION
+def getReleaseRepositoryUrl() {
+    return 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+}
+
+def getSnapshotRepositoryUrl() {
+    return 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+}
 
 afterEvaluate {
     publishing {
@@ -35,6 +40,16 @@ afterEvaluate {
                         developerConnection = 'scm:git@github.com:nabto/edge-client-android-webrtc.git'
                         url = 'https://github.com/nabto/edge-client-android-webrtc'
                     }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                url = rootProject.ext["isReleaseVersion"] ? getReleaseRepositoryUrl() : getSnapshotRepositoryUrl()
+                credentials {
+                    username = rootProject.ext["ossrhUsername"]
+                    password = rootProject.ext["ossrhPassword"]
                 }
             }
         }
