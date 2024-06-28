@@ -47,6 +47,22 @@ data class SDP(
     val sdp: String
 )
 
+private fun StringTypeFromSdp(sdp: SessionDescription) = when (sdp.type) {
+    SessionDescription.Type.OFFER -> "offer"
+    SessionDescription.Type.PRANSWER -> "pranswer"
+    SessionDescription.Type.ANSWER -> "answer"
+    SessionDescription.Type.ROLLBACK -> "rollback"
+    null -> throw IllegalArgumentException("StringTypeFromSdp called with null as argument")
+}
+
+private fun SignalMessageTypeFromSdp(sdp: SessionDescription) = when (sdp.type) {
+    SessionDescription.Type.OFFER -> SignalMessageType.OFFER
+    SessionDescription.Type.PRANSWER -> SignalMessageType.ANSWER
+    SessionDescription.Type.ANSWER -> SignalMessageType.ANSWER
+    SessionDescription.Type.ROLLBACK -> SignalMessageType.OFFER
+    null -> throw IllegalArgumentException("StringTypeFromSdp called with null as argument")
+}
+
 internal class EdgeWebrtcConnectionImpl(
     conn: Connection
 ) : EdgeWebrtcConnection, PeerConnection.Observer, RendererCommon.RendererEvents {
@@ -184,13 +200,8 @@ internal class EdgeWebrtcConnectionImpl(
 
     private suspend fun sendDescription(sdp: SessionDescription) {
         EdgeLogger.info("Sending description to peer: ${sdp.description}")
-        val data = jsonMapper.writeValueAsString(SDP("answer", sdp.description))
-        val type = when (sdp.type) {
-            SessionDescription.Type.OFFER -> SignalMessageType.OFFER
-            SessionDescription.Type.ANSWER -> SignalMessageType.ANSWER
-            else -> SignalMessageType.OFFER
-        }
-        val msg = SignalMessage(type = type, data = data, metadata = createMetadata())
+        val data = jsonMapper.writeValueAsString(SDP(StringTypeFromSdp(sdp), sdp.description))
+        val msg = SignalMessage(type = SignalMessageTypeFromSdp(sdp), data = data, metadata = createMetadata())
         val sendPromise = signaling.send(msg)
         try {
             sendPromise.await()

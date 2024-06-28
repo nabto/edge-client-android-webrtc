@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import com.nabto.edge.client.Connection
 import com.nabto.edge.client.webrtc.impl.EdgeWebrtcManagerInternal
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
+import java.util.concurrent.CompletableFuture
 
 // @TODO: Make our own TextureViewRenderer implementation?
 // @TODO: Make a Jetpack Composable View?
@@ -235,7 +236,7 @@ interface EdgeWebrtcConnection {
 
     /**
      * Create a new data channel
-     * WARNING: Experimental
+     * WARNING: Data channels are experimental and may not work as expected.
      *
      * @param label A string that describes the data channel.
      */
@@ -285,6 +286,7 @@ interface EdgeWebrtcManager {
     fun createRTCConnection(conn: Connection): EdgeWebrtcConnection
 
     companion object {
+        @JvmStatic
         fun getInstance(): EdgeWebrtcManager = EdgeWebrtcManagerInternal.instance
     }
 }
