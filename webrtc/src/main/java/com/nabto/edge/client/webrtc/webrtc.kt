@@ -231,8 +231,9 @@ interface EdgeWebrtcConnection {
      * @throws EdgeWebrtcError.SignalingFailedToInitialize if the signaling stream could not be set up for some reason.
      * @throws EdgeWebrtcError.SignalingFailedRecv if the signaling stream failed to receive messages necessary to setting up the connection.
      * @throws EdgeWebrtcError.SignalingFailedSend if the signaling stream failed to send messages necessary to setting up the connection.
+     * @return A CompletableFuture
      */
-    suspend fun connect()
+    fun connect(): CompletableFuture<Unit>
 
     /**
      * Create a new data channel
@@ -247,7 +248,7 @@ interface EdgeWebrtcConnection {
      *
      * This function does not throw any exceptions.
      */
-    suspend fun connectionClose()
+    fun connectionClose(): CompletableFuture<Unit>
 }
 
 /**

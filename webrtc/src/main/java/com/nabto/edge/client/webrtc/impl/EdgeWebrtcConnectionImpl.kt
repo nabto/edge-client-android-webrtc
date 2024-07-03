@@ -25,8 +25,11 @@ import com.nabto.edge.client.webrtc.SignalMessageType
 import com.nabto.edge.client.webrtc.SignalingIceCandidate
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.future.future
 import kotlinx.coroutines.launch
 import org.webrtc.AddIceObserver
 import org.webrtc.AudioTrack
@@ -40,6 +43,7 @@ import org.webrtc.RtpTransceiver
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 import org.webrtc.VideoTrack
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
 data class SDP(
@@ -144,34 +148,36 @@ internal class EdgeWebrtcConnectionImpl(
         }
     }
 
-    override suspend fun connect() {
+    override fun connect(): CompletableFuture<Unit> {
         val connectPromise = CompletableDeferred<Unit>()
         messageLoopJob = scope.launch {
             messageLoop(connectPromise)
         }
 
-        try {
-            connectSignalingStream(signalingStream)
-            _signaling.start()
-        } catch (error: EdgeWebrtcError.SignalingFailedToInitialize) {
-            EdgeLogger.error("Failed to initialize signaling service.")
-            throw error
-        }
+        return scope.future {
+            try {
+                connectSignalingStream(signalingStream)
+                _signaling.start()
+            } catch (error: EdgeWebrtcError.SignalingFailedToInitialize) {
+                EdgeLogger.error("Failed to initialize signaling service.")
+                throw error
+            }
 
-        val sendPromise = signaling.send(SignalMessage(type = SignalMessageType.TURN_REQUEST))
-        try {
-            sendPromise.await()
-        } catch (e: Exception) {
-            EdgeLogger.error("Failed to send TurnRequest message over signaling; $e")
-            throw EdgeWebrtcError.SignalingFailedSend()
-        }
+            val sendPromise = signaling.send(SignalMessage(type = SignalMessageType.TURN_REQUEST))
+            try {
+                sendPromise.await()
+            } catch (e: Exception) {
+                EdgeLogger.error("Failed to send TurnRequest message over signaling; $e")
+                throw EdgeWebrtcError.SignalingFailedSend()
+            }
 
-        connectPromise.await()
+            connectPromise.await()
+        }
     }
 
-    override suspend fun connectionClose() {
-        if (hasBeenClosed.compareAndSet(false, true)) {
-            scope.launch {
+    override fun connectionClose(): CompletableFuture<Unit> {
+        return scope.future {
+            if (hasBeenClosed.compareAndSet(false, true)) {
                 messageLoopJob?.cancel()
                 if (::peerConnection.isInitialized) {
                     peerConnection.dispose()

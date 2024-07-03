@@ -47,6 +47,13 @@ android {
             withJavadocJar()
         }
     }
+
+    packaging {
+        resources.excludes.apply {
+            add("META-INF/LICENSE.md")
+            add("META-INF/LICENSE-notice.md")
+        }
+    }
 }
 
 dependencies {
@@ -64,9 +71,14 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.core.ktx)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.rules)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
 }
