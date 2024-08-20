@@ -5,6 +5,9 @@ import android.util.AttributeSet
 import com.nabto.edge.client.Connection
 import com.nabto.edge.client.webrtc.impl.EdgeWebrtcManagerInternal
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
+import org.webrtc.AudioSource
+import org.webrtc.MediaConstraints
+import org.webrtc.VideoSource
 import java.util.concurrent.CompletableFuture
 
 // @TODO: Make our own TextureViewRenderer implementation?
@@ -243,6 +246,9 @@ interface EdgeWebrtcConnection {
      */
     fun createDataChannel(label: String): EdgeDataChannel
 
+    // @TODO: Documentation
+    fun addTrack(track: EdgeMediaTrack, streamIds: List<String>)
+
     /**
      * Close a connected WebRTC connection.
      *
@@ -285,6 +291,18 @@ interface EdgeWebrtcManager {
      * @return The created EdgeWebrtcConnection object
      */
     fun createRTCConnection(conn: Connection): EdgeWebrtcConnection
+
+    // @TODO: Documentation
+    fun createAudioSource(mediaConstraints: MediaConstraints): AudioSource
+
+    // @TODO: Documentation
+    fun createVideoSource(isScreenCast: Boolean): VideoSource
+
+    // @TODO: Documentation
+    fun createAudioTrack(trackId: String, source: AudioSource): EdgeAudioTrack
+
+    // @TODO: Documentation
+    fun createVideoTrack(trackId: String, source: VideoSource): EdgeVideoTrack
 
     companion object {
         @JvmStatic

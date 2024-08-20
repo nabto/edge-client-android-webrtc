@@ -5,7 +5,7 @@ import com.nabto.edge.client.webrtc.EdgeMediaTrackType
 import org.webrtc.AudioTrack
 import java.lang.IllegalStateException
 
-internal class EdgeAudioTrackImpl(private val track: AudioTrack) : EdgeAudioTrack {
+internal class EdgeAudioTrackImpl(val track: AudioTrack) : EdgeAudioTrack {
     override val type: EdgeMediaTrackType
         get() = EdgeMediaTrackType.AUDIO
 

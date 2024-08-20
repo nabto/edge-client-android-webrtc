@@ -3,16 +3,21 @@ package com.nabto.edge.client.webrtc.impl
 import android.content.Context
 import androidx.startup.Initializer
 import com.nabto.edge.client.Connection
+import com.nabto.edge.client.webrtc.EdgeAudioTrack
+import com.nabto.edge.client.webrtc.EdgeVideoTrack
 import com.nabto.edge.client.webrtc.EdgeVideoView
 import com.nabto.edge.client.webrtc.EdgeWebrtcLogLevel
 import com.nabto.edge.client.webrtc.EdgeWebrtcManager
 import com.nabto.edge.client.webrtc.EdgeWebrtcConnection
+import org.webrtc.AudioSource
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.Logging
+import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.RendererCommon
+import org.webrtc.VideoSource
 
 internal class EdgeWebrtcManagerInternal : EdgeWebrtcManager {
     companion object {
@@ -50,6 +55,24 @@ internal class EdgeWebrtcManagerInternal : EdgeWebrtcManager {
         val webrtcInfoCoap = conn.createCoap("GET", "/p2p/webrtc-info")
         val signalingStream = conn.createStream()
         return EdgeWebrtcConnectionImpl(peerConnectionFactory, webrtcInfoCoap, signalingStream)
+    }
+
+    override fun createAudioSource(mediaConstraints: MediaConstraints): AudioSource {
+        return peerConnectionFactory.createAudioSource(mediaConstraints)
+    }
+
+    override fun createVideoSource(isScreenCast: Boolean): VideoSource {
+        return peerConnectionFactory.createVideoSource(isScreenCast)
+    }
+
+    override fun createAudioTrack(trackId: String, source: AudioSource): EdgeAudioTrack {
+        val rtcTrack = peerConnectionFactory.createAudioTrack(trackId, source)
+        return EdgeAudioTrackImpl(rtcTrack)
+    }
+
+    override fun createVideoTrack(trackId: String, source: VideoSource): EdgeVideoTrack {
+        val rtcTrack = peerConnectionFactory.createVideoTrack(trackId, source)
+        return EdgeVideoTrackImpl(rtcTrack)
     }
 }
 
