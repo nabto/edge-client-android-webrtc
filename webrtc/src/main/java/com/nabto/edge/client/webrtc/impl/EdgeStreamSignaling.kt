@@ -40,7 +40,7 @@ class EdgeStreamSignaling(private val stream: Stream) : EdgeSignaling {
 
     private val initialized = CompletableDeferred<Unit>()
 
-    fun start() {
+    override fun start() {
         initialized.complete(Unit)
         scope.launch {
             messageFlow.collect { box ->

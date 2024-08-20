@@ -55,6 +55,7 @@ data class SignalMessage(
 )
 
 interface EdgeSignaling {
+    fun start()
     suspend fun send(msg: SignalMessage): Deferred<Unit>
     suspend fun recv(): SignalMessage
 }

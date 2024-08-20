@@ -47,7 +47,9 @@ internal class EdgeWebrtcManagerInternal : EdgeWebrtcManager {
     }
 
     override fun createRTCConnection(conn: Connection): EdgeWebrtcConnection {
-        return EdgeWebrtcConnectionImpl(conn)
+        val webrtcInfoCoap = conn.createCoap("GET", "/p2p/webrtc-info")
+        val signalingStream = conn.createStream()
+        return EdgeWebrtcConnectionImpl(peerConnectionFactory, webrtcInfoCoap, signalingStream)
     }
 }
 

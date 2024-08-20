@@ -39,45 +39,18 @@ inline fun <reified T: Throwable> assertThrow(code: () -> Unit) {
 class EdgeStreamSignalingTest {
     private val jsonMapper = jacksonObjectMapper()
     lateinit var signaling: EdgeStreamSignaling
-    val mockStream = mockk<Stream>()
-    val bytes = mutableListOf<Byte>()
-    val writtenBytes = mutableListOf<Byte>()
+    lateinit var mockStream: MockStream
 
     @Before
     fun beforeEach() {
-        signaling = EdgeStreamSignaling(mockStream)
+        mockStream = MockStream()
+        signaling = EdgeStreamSignaling(mockStream.getStream())
         signaling.start()
-        bytes.clear()
-        writtenBytes.clear()
-
-        val bytesSlot = slot<ByteArray?>()
-        val callbackSlot = slot<NabtoCallback<Any>?>()
-        every { mockStream.writeCallback(captureNullable(bytesSlot), captureNullable(callbackSlot)) } answers {
-            bytesSlot.captured?.let { writtenBytes.addAll(it.toList()) }
-            callbackSlot.captured?.run(ErrorCodes.OK, Optional.empty())
-        }
-    }
-
-    fun prepareString(str: String) {
-        val len = str.length
-        val lenBytes = ByteBuffer.allocate(Int.SIZE_BYTES).putInt(len).array()
-        lenBytes.reverse()
-        val strBytes = str.toByteArray()
-        bytes.addAll((lenBytes + strBytes).toList())
-
-        val lengthSlot = slot<Int>()
-        val callbackSlot = slot<NabtoCallback<ByteArray>?>()
-        every { mockStream.readAllCallback(capture(lengthSlot), captureNullable(callbackSlot)) } answers {
-            val result = bytes.take(lengthSlot.captured)
-            bytes.subList(0, lengthSlot.captured).clear()
-            result.toByteArray()
-            callbackSlot.captured?.run(ErrorCodes.OK, Optional.of(result.toByteArray()))
-        }
     }
 
     @Test
     fun offerShouldSucceed() = runTest {
-        prepareString("""
+        mockStream.prepareString("""
             {
                 "type": 0,
                 "data": "{\"type\": \"offer\", \"sdp\": \"v=0...\"}"
@@ -93,7 +66,7 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun answerShouldSucceed() = runTest {
-        prepareString("""
+        mockStream.prepareString("""
             {
                 "type": 1,
                 "data": "{\"type\": \"answer\", \"sdp\": \"v=0...\"}"
@@ -109,10 +82,11 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun iceCandidateShouldSucceed() = runTest {
-        prepareString("""
+        mockStream.prepareString("""
             {
                 "type": 2,
-                "data": "{\"sdpMid\": \"foo\", \"candidate\": \"bar\"}"
+                "data": "{\"sdpMid\": \"foo\", \"candidate\": \"bar\"}",
+                "foo": "bar"
             }
         """.trimIndent())
 
@@ -125,7 +99,7 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun iceCandidateMissingSdpShouldFail() = runTest {
-        prepareString("""
+        mockStream.prepareString("""
             {
                 "type": 2,
                 "data": "{\"sdpMid\": \"bobdog\"}"
@@ -142,7 +116,7 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun testIceServerExample1() = runTest {
-        prepareString(IceServerDataSet.example1)
+        mockStream.prepareString(IceServerDataSet.example1)
 
         val msg = signaling.recv()
         assertEquals(msg.type, SignalMessageType.TURN_RESPONSE)
@@ -151,7 +125,7 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun testIceServerExample2() = runTest {
-        prepareString(IceServerDataSet.example2)
+        mockStream.prepareString(IceServerDataSet.example2)
 
         val msg = signaling.recv()
         assertEquals(msg.type, SignalMessageType.TURN_RESPONSE)
@@ -163,7 +137,7 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun testIceServerExample3() = runTest {
-        prepareString(IceServerDataSet.example3)
+        mockStream.prepareString(IceServerDataSet.example3)
 
         val msg = signaling.recv()
         assertEquals(msg.type, SignalMessageType.TURN_RESPONSE)
@@ -180,7 +154,7 @@ class EdgeStreamSignalingTest {
 
     @Test
     fun testIceServerMissingUrls() = runTest {
-        prepareString(IceServerDataSet.invalidMissingUrls)
+        mockStream.prepareString(IceServerDataSet.invalidMissingUrls)
 
         assertThrow<MismatchedInputException> {
             signaling.recv()
@@ -192,10 +166,10 @@ class EdgeStreamSignalingTest {
         val msg = SignalMessage(type = SignalMessageType.TURN_REQUEST)
         signaling.send(msg).await()
 
-        val lenBytes = writtenBytes.subList(0, 4)
+        val lenBytes = mockStream.writtenBytes.subList(0, 4)
         val len = ByteBuffer.wrap(lenBytes.toByteArray().reversedArray()).getInt()
 
-        val strBytes = writtenBytes.subList(4, writtenBytes.size)
+        val strBytes = mockStream.writtenBytes.subList(4, mockStream.writtenBytes.size)
         val str = String(strBytes.toByteArray(), Charsets.UTF_8)
         val writtenMsg = jsonMapper.readValue(str, SignalMessage::class.java)
 
@@ -208,7 +182,7 @@ class EdgeStreamSignalingTest {
         val msg = SignalMessage(type = SignalMessageType.TURN_REQUEST)
         signaling.send(msg).await()
 
-        val strBytes = writtenBytes.subList(4, writtenBytes.size)
+        val strBytes = mockStream.writtenBytes.subList(4, mockStream.writtenBytes.size)
         val str = String(strBytes.toByteArray(), Charsets.UTF_8)
         // expect no other fields like "data", "iceSerers" etc.
         assertEquals(str, "{\"type\":3}")

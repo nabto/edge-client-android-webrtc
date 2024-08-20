@@ -8,16 +8,16 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="connect should succeed()">
+        <State />
+      </entry>
+      <entry key="connectShouldSucceed()">
+        <State />
+      </entry>
       <entry key="iceCandidateMissingSdpShouldFail()">
         <State />
       </entry>
-      <entry key="offerShouldSucceed()">
-        <State />
-      </entry>
-      <entry key="sendTurnRequestShouldSucceed()">
-        <State />
-      </entry>
-      <entry key="testIceServerExample3()">
+      <entry key="iceCandidateShouldSucceed()">
         <State />
       </entry>
       <entry key="webrtc">

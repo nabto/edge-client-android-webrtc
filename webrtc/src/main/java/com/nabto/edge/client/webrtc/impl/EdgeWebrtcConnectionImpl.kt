@@ -1,8 +1,10 @@
 package com.nabto.edge.client.webrtc.impl
 
+import android.util.Log
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.nabto.edge.client.Coap
 import com.nabto.edge.client.Connection
 import com.nabto.edge.client.ErrorCodes
 import com.nabto.edge.client.NabtoEOFException
@@ -31,6 +33,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.future.future
 import kotlinx.coroutines.launch
+import net.bytebuddy.implementation.bytecode.Throw
 import org.webrtc.AddIceObserver
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -38,6 +41,7 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnection.IceServer
+import org.webrtc.PeerConnectionFactory
 import org.webrtc.RendererCommon
 import org.webrtc.RtpTransceiver
 import org.webrtc.SdpObserver
@@ -68,17 +72,16 @@ private fun SignalMessageTypeFromSdp(sdp: SessionDescription) = when (sdp.type) 
 }
 
 internal class EdgeWebrtcConnectionImpl(
-    conn: Connection
+    private val peerConnectionFactory: PeerConnectionFactory,
+    private val webrtcInfoCoap: Coap,
+    private val signalingStream: Stream,
+    private val signaling: EdgeSignaling = EdgeStreamSignaling(signalingStream)
 ) : EdgeWebrtcConnection, PeerConnection.Observer, RendererCommon.RendererEvents {
     private lateinit var peerConnection: PeerConnection
     private val scope = CoroutineScope(Dispatchers.IO)
     private val jsonMapper = jacksonObjectMapper()
 
     // Signaling related stuff
-    private val webrtcInfoCoap = conn.createCoap("GET", "/p2p/webrtc-info")
-    private val signalingStream = conn.createStream()
-    private val _signaling = EdgeStreamSignaling(signalingStream)
-    private val signaling: EdgeSignaling get() = _signaling
     private val receivedMetadata = mutableMapOf<String, MetadataTrack>()
 
     private var polite = true
@@ -157,7 +160,7 @@ internal class EdgeWebrtcConnectionImpl(
         return scope.future {
             try {
                 connectSignalingStream(signalingStream)
-                _signaling.start()
+                signaling.start()
             } catch (error: EdgeWebrtcError.SignalingFailedToInitialize) {
                 EdgeLogger.error("Failed to initialize signaling service.")
                 throw error
@@ -334,7 +337,7 @@ internal class EdgeWebrtcConnectionImpl(
                 break
             } ?: continue
 
-            EdgeLogger.info("Received signaling messaage of type ${msg.type}")
+            EdgeLogger.info("Received signaling message of type ${msg.type}")
             when (msg.type) {
                 SignalMessageType.ANSWER -> {
                     val answerData = jsonMapper.readValue(msg.data!!, SDP::class.java)
@@ -387,7 +390,7 @@ internal class EdgeWebrtcConnectionImpl(
                     pcOpts.bundlePolicy = PeerConnection.BundlePolicy.BALANCED
                     pcOpts.iceServers = iceServers
 
-                    peerConnection = EdgeWebrtcManagerInternal.peerConnectionFactory.createPeerConnection(pcOpts, this) ?: run {
+                    peerConnection = peerConnectionFactory.createPeerConnection(pcOpts, this) ?: run {
                         EdgeLogger.error("PeerConnectionFactory.createPeerConnection failed. Returned peerConnection is null.")
                         onErrorCallback?.invoke(EdgeWebrtcError.ConnectionInitError())
                         throw EdgeWebrtcError.ConnectionInitError()
