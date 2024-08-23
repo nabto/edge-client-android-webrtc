@@ -246,7 +246,12 @@ interface EdgeWebrtcConnection {
      */
     fun createDataChannel(label: String): EdgeDataChannel
 
-    // @TODO: Documentation
+    /**
+     * Add a track to this connection.
+     *
+     * @param track The track to be added.
+     * @param streamIds List of stream ids that this track will be added to.
+     */
     fun addTrack(track: EdgeMediaTrack, streamIds: List<String>)
 
     /**
@@ -292,16 +297,34 @@ interface EdgeWebrtcManager {
      */
     fun createRTCConnection(conn: Connection): EdgeWebrtcConnection
 
-    // @TODO: Documentation
+    /**
+     * Create an AudioSource object that can be used to create a EdgeAudioTrack with createAudioTrack
+     *
+     * @param mediaConstraints a MediaConstraints object. Refer to https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints#instance_properties_of_audio_tracks
+     */
     fun createAudioSource(mediaConstraints: MediaConstraints): AudioSource
 
-    // @TODO: Documentation
+    /**
+     * Create a VideoSource object that can be used to create a EdgeVideoTrack with createVideoTrack
+     *
+     * @param isScreenCast Sets whether the video a screencast or not
+     */
     fun createVideoSource(isScreenCast: Boolean): VideoSource
 
-    // @TODO: Documentation
+    /**
+     * Create a EdgeAudioTrack that can be added to a peer connection
+     *
+     * @param trackId The id of the track
+     * @param source An AudioSource object created with createAudioSource
+     */
     fun createAudioTrack(trackId: String, source: AudioSource): EdgeAudioTrack
 
-    // @TODO: Documentation
+    /**
+     * Create a EdgeVideoTrack that can be added to a peer connection.
+     *
+     * @param trackId The id of the track.
+     * @param source A VideoSource object created with createvideoSource
+     */
     fun createVideoTrack(trackId: String, source: VideoSource): EdgeVideoTrack
 
     companion object {
