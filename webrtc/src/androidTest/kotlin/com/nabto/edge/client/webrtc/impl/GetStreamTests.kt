@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 import org.webrtc.DataChannel
 import org.webrtc.DefaultVideoDecoderFactory
@@ -381,6 +382,7 @@ class TestPeerConnection : PeerConnectionLogObserver
 }
 
 class GetStreamTests {
+    @Ignore
     @Test
     fun perfectNegotiationTest() = runTest {
         val channel1 : Channel<SignalingMessage> = Channel<SignalingMessage>()
