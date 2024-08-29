@@ -9,7 +9,7 @@ pipeline {
                 srcDir = pwd()
             }
             steps {
-                withChecks(name: "Build android") {
+                withChecks() {
                     sh './scripts/ci.sh build'
                 }
             }
