@@ -9,9 +9,7 @@ pipeline {
                 srcDir = pwd()
             }
             steps {
-                withChecks() {
-                    sh './scripts/ci.sh build'
-                }
+                sh './scripts/ci.sh build'
             }
         }
 
