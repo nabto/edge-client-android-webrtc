@@ -1,5 +1,6 @@
 package com.nabto.edge.client.webrtc
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonValue
 import kotlinx.coroutines.Deferred
@@ -12,11 +13,15 @@ enum class SignalMessageType(@get:JsonValue val num: Int) {
     TURN_RESPONSE(4)
 }
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SignalingIceCandidate(
     val sdpMid: String,
     val candidate: String
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class TurnServer(
     val hostname: String,
     val port: Int,
@@ -25,6 +30,7 @@ data class TurnServer(
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class IceServer(
     val urls: List<String>,
     val username: String? = null,
@@ -32,6 +38,7 @@ data class IceServer(
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class MetadataTrack(
     val mid: String,
     val trackId: String,
@@ -39,6 +46,7 @@ data class MetadataTrack(
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SignalMessageMetadata(
     val tracks: List<MetadataTrack>? = null,
     val noTrickle: Boolean = false,
@@ -46,6 +54,7 @@ data class SignalMessageMetadata(
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SignalMessage(
     val type: SignalMessageType,
     val data: String? = null,

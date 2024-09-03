@@ -80,7 +80,7 @@ class EdgeWebrtcConnectionTest {
 
         every { mockFactory.createPeerConnection(any<PeerConnection.RTCConfiguration>(), any<PeerConnection.Observer>()) } returns(mockPc)
 
-        peerConnection = EdgeWebrtcConnectionImpl(mockFactory, mockCoap, mockStream.getStream(), mockSignaling)
+        peerConnection = EdgePeerConnection(mockFactory, mockCoap, mockStream.getStream(), mockSignaling)
     }
 
     @After
@@ -91,6 +91,6 @@ class EdgeWebrtcConnectionTest {
     fun connectShouldSucceed() = runTest {
         msgChannel.send(SignalMessage(type = SignalMessageType.TURN_RESPONSE, iceServers = listOf()))
         peerConnection.connect().await()
-        coVerify { mockSignaling.send(SignalMessage(type = SignalMessageType.TURN_REQUEST)) }
+        coVerify { mockSignaling.send(SignalMessage(type = SignalMessageType.TURN_REQUEST)).await() }
     }
 }
