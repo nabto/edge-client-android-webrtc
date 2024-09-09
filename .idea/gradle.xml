@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/webrtc" />
             <option value="$PROJECT_DIR$/webrtc-demo" />
             <option value="$PROJECT_DIR$/webrtc-demo-java" />
+            <option value="$PROJECT_DIR$/webrtc-demo2" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

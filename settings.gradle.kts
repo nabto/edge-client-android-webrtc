@@ -21,3 +21,4 @@ rootProject.name = "webrtc"
 include(":webrtc")
 include(":webrtc-demo")
 include(":webrtc-demo-java")
+include(":webrtc-demo2")
