@@ -119,6 +119,10 @@ internal class EdgePeerConnection(
         }
     }
 
+    override fun getPeerConnection(): PeerConnection? {
+        return peerConnection
+    }
+
     // Forward to PerfectNegotiator
     override fun onRenegotiationNeeded() {
         super.onRenegotiationNeeded()

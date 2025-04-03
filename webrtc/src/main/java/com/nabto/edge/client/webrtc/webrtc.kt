@@ -7,6 +7,7 @@ import com.nabto.edge.client.webrtc.impl.EdgeWebrtcManagerInternal
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import org.webrtc.AudioSource
 import org.webrtc.MediaConstraints
+import org.webrtc.PeerConnection
 import org.webrtc.VideoSource
 import java.util.concurrent.CompletableFuture
 
@@ -260,6 +261,11 @@ interface EdgeWebrtcConnection {
      * This function does not throw any exceptions.
      */
     fun connectionClose(): CompletableFuture<Unit>
+
+    /**
+     * Get the underlying PeerConnection object.
+     */
+    fun getPeerConnection(): PeerConnection?
 }
 
 /**
