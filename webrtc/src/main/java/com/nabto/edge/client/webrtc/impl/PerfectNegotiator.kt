@@ -3,6 +3,8 @@ package com.nabto.edge.client.webrtc.impl
 import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.nabto.edge.client.ErrorCodes
+import com.nabto.edge.client.NabtoRuntimeException
 import com.nabto.edge.client.webrtc.EdgeSignaling
 import com.nabto.edge.client.webrtc.MetadataTrack
 import com.nabto.edge.client.webrtc.SignalMessage
@@ -68,6 +70,13 @@ internal class PerfectNegotiator(
             while (true) {
                 val signalingMessage = try {
                     signaling.recv()
+                } catch (e: NabtoRuntimeException) {
+                    if (e.errorCode.errorCode == ErrorCodes.STOPPED) {
+                        break
+                    } else {
+                        EdgeLogger.error("Failed to receive signaling message: $e")
+                        null
+                    }
                 } catch (e: Exception) {
                     EdgeLogger.error("Failed to receive signaling message: $e")
                     null
