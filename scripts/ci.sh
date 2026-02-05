@@ -26,10 +26,11 @@ publish() {
         --user $(id -u):$(id -g) \
         -e GRADLE_USER_HOME=/sandbox/.containercache/gradlehome \
         -e HOME=/sandbox/.containercache/userhome \
-        -e SIGNING_KEY_BASE64 \
-        -e SIGNING_PASSWORD \
-        -e OSSRH_USERNAME \
-        -e OSSRH_PASSWORD \
+        -e ORG_GRADLE_PROJECT_GPG_SIGNING_KEY_BASE64 \
+        -e ORG_GRADLE_PROJECT_GPG_SIGNING_PUBLIC_KEY_BASE64 \
+        -e ORG_GRADLE_PROJECT_GPG_SIGNING_PASSWORD \
+        -e ORG_GRADLE_PROJECT_OSSRH_USERNAME \
+        -e ORG_GRADLE_PROJECT_OSSRH_PASSWORD \
         $IMAGE_NAME scripts/publish.sh
 }
 

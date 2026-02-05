@@ -4,9 +4,8 @@ plugins {
 }
 
 rootProject.extra.apply {
-    set("POM_GROUP_ID", "com.nabto.edge.client")
+    set("POM_GROUP", "com.nabto.edge.client")
     set("POM_ARTIFACT_ID", "webrtc")
-    set("POM_VERSION", rootProject.extra["buildVersionName"])
 }
 
 apply(from ="$rootDir/scripts/publish.gradle")

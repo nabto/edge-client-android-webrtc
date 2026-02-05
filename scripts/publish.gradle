@@ -1,22 +1,18 @@
 apply plugin: 'maven-publish'
-apply plugin: 'signing'
+apply from: "${rootDir}/scripts/versioning.gradle"
 
-def getReleaseRepositoryUrl() {
-    return 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-}
-
-def getSnapshotRepositoryUrl() {
-    return 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-}
-
-afterEvaluate {
+afterEvaluate { project ->
     publishing {
         publications {
             release(MavenPublication) {
-                groupId POM_GROUP_ID
-                artifactId POM_ARTIFACT_ID
-                version POM_VERSION
-
+                groupId = POM_GROUP
+                if (isReleaseVersion()) {
+                    version = buildVersionName()
+                } else {
+                    // this makes it possible to specify the master-SNAPSHOT
+                    version = gitBranch + "-SNAPSHOT"
+                }
+                artifactId = POM_ARTIFACT_ID
                 from components.release
                 pom {
                     name = POM_ARTIFACT_ID
@@ -40,30 +36,26 @@ afterEvaluate {
                         developerConnection = 'scm:git@github.com:nabto/edge-client-android-webrtc.git'
                         url = 'https://github.com/nabto/edge-client-android-webrtc'
                     }
+
+                    // The POM checker that JReleaser uses will error without this, see:
+                    // https://github.com/jreleaser/jreleaser.github.io/issues/85#issuecomment-3062376973
+                    pom.withXml {
+                        def buildNode = asNode().appendNode('build')
+                        def pluginsNode = buildNode.appendNode('plugins')
+                        def pluginNode = pluginsNode.appendNode('plugin')
+                        pluginNode.appendNode('groupId', 'com.simpligility.maven.plugins')
+                        pluginNode.appendNode('artifactId', 'android-maven-plugin')
+                        pluginNode.appendNode('version', '4.6.0')
+                        pluginNode.appendNode('extensions', 'true')
+                    }
                 }
             }
         }
 
         repositories {
             maven {
-                url = rootProject.ext["isReleaseVersion"] ? getReleaseRepositoryUrl() : getSnapshotRepositoryUrl()
-                credentials {
-                    username = rootProject.ext["ossrhUsername"]
-                    password = rootProject.ext["ossrhPassword"]
-                }
+                url = rootProject.layout.buildDirectory.dir('staging-deploy')
             }
         }
     }
 }
-
-signing {
-    def signingKeyB64 = rootProject.ext["signingKeyBase64"]
-    def signingPassword = rootProject.ext["signingPassword"]
-    def signingKey = new String(Base64.decoder.decode(signingKeyB64))
-    useInMemoryPgpKeys(
-        signingKey,
-            signingPassword,
-    )
-    sign publishing.publications
-}
-
