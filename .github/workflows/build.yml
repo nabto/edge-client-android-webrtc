@@ -1,9 +1,9 @@
 name: Build
 
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches: ['**']
+    tags: ['**']
 
 concurrency:
   group: build-${{ github.workflow }}-${{ github.ref }}
