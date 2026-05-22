@@ -8,13 +8,21 @@ plugins {
     id("org.jreleaser") version "1.22.0"
 }
 
-// JReleaser 1.22.0's bcpg-jdk18on calls APIs that require bcprov-jdk18on >= 1.71.
-// Pin all BouncyCastle artifacts on the buildscript classpath to a single recent
-// version so an older transitive bcprov can't shadow JReleaser's expectations.
+// AGP brings BouncyCastle's legacy -jdk15on flavor (last release 1.70) while
+// JReleaser 1.22.0 brings -jdk18on. Both share the org.bouncycastle.* packages,
+// so the older -jdk15on classes can shadow APIs JReleaser needs and cause a
+// NoSuchMethodError on BigIntegers.writeUnsignedByteArray. Substitute -jdk15on
+// with -jdk18on (drop-in on JDK 8+) and pin everything to one version.
 buildscript {
     configurations.classpath {
+        resolutionStrategy.dependencySubstitution {
+            substitute(module("org.bouncycastle:bcprov-jdk15on"))
+                .using(module("org.bouncycastle:bcprov-jdk18on:1.80"))
+            substitute(module("org.bouncycastle:bcpkix-jdk15on"))
+                .using(module("org.bouncycastle:bcpkix-jdk18on:1.80"))
+        }
         resolutionStrategy.eachDependency {
-            if (requested.group == "org.bouncycastle") {
+            if (requested.group == "org.bouncycastle" && requested.name.endsWith("-jdk18on")) {
                 useVersion("1.80")
             }
         }
