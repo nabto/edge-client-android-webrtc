@@ -13,9 +13,12 @@ jreleaser {
     signing {
         active = 'ALWAYS'
         armored = true
-        passphrase = GPG_SIGNING_PASSWORD
-        publicKey = new String(Base64.decoder.decode(GPG_SIGNING_PUBLIC_KEY_BASE64))
-        secretKey = new String(Base64.decoder.decode(GPG_SIGNING_KEY_BASE64))
+        // .trim() guards against trailing newlines in CI secrets — BouncyCastle
+        // reports a wrong passphrase as a generic "checksum mismatch" which is
+        // hard to diagnose.
+        passphrase = GPG_SIGNING_PASSWORD.trim()
+        publicKey = new String(Base64.decoder.decode(GPG_SIGNING_PUBLIC_KEY_BASE64.trim()))
+        secretKey = new String(Base64.decoder.decode(GPG_SIGNING_KEY_BASE64.trim()))
     }
     deploy {
         maven {
