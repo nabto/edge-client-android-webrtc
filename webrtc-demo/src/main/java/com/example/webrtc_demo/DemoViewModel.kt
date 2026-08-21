@@ -17,6 +17,7 @@ import com.nabto.edge.client.webrtc.EdgeWebrtcLogLevel
 import com.nabto.edge.client.webrtc.EdgeWebrtcManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -33,7 +34,11 @@ class DemoViewModel(application: Application) : AndroidViewModel(application) {
     private val _videoTrack = MutableStateFlow<EdgeVideoTrack?>(null)
     val videoTrack: StateFlow<EdgeVideoTrack?> = _videoTrack
 
-    private val timeFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
+    // SimpleDateFormat is not thread safe and status() is called from Nabto/WebRTC
+    // callback threads as well as coroutines, so each thread gets its own instance.
+    private val timeFormat = object : ThreadLocal<SimpleDateFormat>() {
+        override fun initialValue() = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
+    }
 
     private var client: NabtoClient? = null
     private var conn: Connection? = null
@@ -43,7 +48,8 @@ class DemoViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun status(msg: String) {
         Log.i(TAG, msg)
-        _statusLog.value = _statusLog.value + "${timeFormat.format(Date())} $msg"
+        val line = "${timeFormat.get()!!.format(Date())} $msg"
+        _statusLog.update { it + line }
     }
 
     /**
@@ -93,7 +99,8 @@ class DemoViewModel(application: Application) : AndroidViewModel(application) {
             }
         })
 
-        status("Connecting to $productId/$deviceId (SCT \"$sct\")")
+        // Do not log the SCT itself; it is a credential.
+        status("Connecting to $productId/$deviceId (SCT set, ${sct.length} chars)")
         try {
             conn.awaitConnect()
         } catch (e: Exception) {
