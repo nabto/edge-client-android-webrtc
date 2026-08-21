@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
 rootProject.extra.apply {
@@ -12,12 +11,12 @@ apply(from ="$rootDir/scripts/publish.gradle")
 
 android {
     namespace = "com.nabto.edge.client.webrtc"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         namespace = "com.nabto.edge.client.webrtc"
         minSdk = 24
-        testOptions.targetSdk = 34
+        testOptions.targetSdk = 36
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -32,12 +31,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     publishing {

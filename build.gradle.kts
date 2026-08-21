@@ -2,18 +2,24 @@
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.jetbrainsKotlinAndroid) apply false
     id("base")
     id("maven-publish")
-    id("org.jreleaser") version "1.22.0"
+    id("org.jreleaser") version "1.25.0"
 }
 
 // AGP brings BouncyCastle's legacy -jdk15on flavor (last release 1.70) while
-// JReleaser 1.22.0 brings -jdk18on. Both share the org.bouncycastle.* packages,
+// JReleaser brings -jdk18on. Both share the org.bouncycastle.* packages,
 // so the older -jdk15on classes can shadow APIs JReleaser needs and cause a
 // NoSuchMethodError on BigIntegers.writeUnsignedByteArray. Substitute -jdk15on
 // with -jdk18on (drop-in on JDK 8+) and pin everything to one version.
 buildscript {
+    dependencies {
+        // AGP's SDK-XML parsing (jaxb-runtime 2.3.x) needs the old javax.activation
+        // namespace, but JReleaser upgrades jakarta.activation-api to 2.x where the
+        // classes moved to jakarta.activation.*. Provide the javax.* flavor as well,
+        // otherwise the build fails with NoClassDefFoundError: javax/activation/DataSource.
+        classpath("com.sun.activation:javax.activation:1.2.0")
+    }
     configurations.classpath {
         resolutionStrategy.dependencySubstitution {
             substitute(module("org.bouncycastle:bcprov-jdk15on"))
@@ -30,7 +36,6 @@ buildscript {
 }
 
 apply(from="$rootDir/scripts/versioning.gradle")
-val buildVersionName: groovy.lang.Closure<String> by extra
 
 rootProject.extra.apply {
     set("JRELEASER_GROUP_ID", "com.nabto.edge.client")

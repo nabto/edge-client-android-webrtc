@@ -19,6 +19,6 @@ RUN mv $ANDROID_HOME/temp $ANDROID_HOME/cmdline-tools/latest
 
 RUN yes | $ANDROID_SDKMANAGER --licenses
 RUN $ANDROID_SDKMANAGER "tools" "platform-tools"
-RUN $ANDROID_SDKMANAGER "build-tools;34.0.0"
-RUN $ANDROID_SDKMANAGER "platforms;android-34"
+RUN $ANDROID_SDKMANAGER "build-tools;36.0.0"
+RUN $ANDROID_SDKMANAGER "platforms;android-37.0"
 RUN yes | $ANDROID_SDKMANAGER --licenses
