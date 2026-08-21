@@ -1,26 +1,25 @@
 [versions]
-agp = "8.3.2"
-constraintlayout = "2.1.4"
-coreKtx = "1.13.0"
-coreKtxVersion = "1.5.0"
-espressoCore = "3.5.1"
-jackson = "2.17.0"
-junitJupiter = "5.8.1"
-kotlin = "1.9.23"
+agp = "9.3.1"
+constraintlayout = "2.2.2"
+coreKtx = "1.19.0"
+coreKtxVersion = "1.7.0"
+espressoCore = "3.7.0"
+# Jackson 2.20+ (jackson-module-kotlin) uses MethodHandle.invokeExact, which requires
+# minSdk 26; stay on the 2.19.x line while the webrtc library supports minSdk 24.
+jackson = "2.19.4"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-appcompat = "1.6.1"
-kotlinxCoroutinesCore = "1.7.3"
-material = "1.11.0"
-mockk = "1.13.11"
+junitVersion = "1.3.0"
+appcompat = "1.8.0"
+kotlinxCoroutinesCore = "1.11.0"
+material = "1.14.0"
+mockk = "1.14.11"
 nabtoVersion = "3.1.0"
-navigationFragmentKtx = "2.7.7"
-runner = "1.5.2"
-startupRuntime = "1.1.1"
-webrtcVersion = "1.0.5"
-nexusPlugin = "1.3.0"
-lifecycleLivedataKtx = "2.7.0"
-lifecycleViewmodelKtx = "2.7.0"
+navigationFragmentKtx = "2.9.8"
+runner = "1.7.0"
+startupRuntime = "1.2.0"
+webrtcVersion = "1.3.10"
+lifecycleLivedataKtx = "2.11.0"
+lifecycleViewmodelKtx = "2.11.0"
 
 [libraries]
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
@@ -40,7 +39,6 @@ jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesCore" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
@@ -63,5 +61,3 @@ jackson = ["jackson-core", "jackson-module-kotlin", "jackson-annotations", "jack
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref =  "agp" }
-jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-nexusPlugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPlugin" }
