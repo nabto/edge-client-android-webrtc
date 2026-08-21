@@ -1,5 +1,10 @@
 [versions]
 agp = "9.3.1"
+# Must match the Kotlin version of AGP's built-in Kotlin (KGP 2.2.10 for AGP 9.3.x);
+# bump together with agp.
+composeCompiler = "2.2.10"
+composeBom = "2026.08.00"
+activityCompose = "1.13.0"
 constraintlayout = "2.2.2"
 coreKtx = "1.19.0"
 coreKtxVersion = "1.7.0"
@@ -54,6 +59,12 @@ stream-webrtc-android-ui = { module = "io.getstream:stream-webrtc-android-ui", v
 stream-webrtc-android-ktx = { module = "io.getstream:stream-webrtc-android-ktx", version.ref = "webrtcVersion" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationFragmentKtx" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelKtx" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-module-kotlin", "jackson-annotations", "jackson-databind", "jackson-dataformat-cbor"]
@@ -61,3 +72,4 @@ jackson = ["jackson-core", "jackson-module-kotlin", "jackson-annotations", "jack
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref =  "agp" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "composeCompiler" }
