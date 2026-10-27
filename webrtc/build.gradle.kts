@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         namespace = "com.nabto.edge.client.webrtc"
-        minSdk = 24
+        minSdk = 28
         testOptions.targetSdk = 36
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
